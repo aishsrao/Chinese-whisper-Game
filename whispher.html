@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Whisper Challenge Game</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        color: #333;
+        overflow-x: hidden;
+      }
+
+      .header {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(20px);
+        padding: 30px 20px;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      }
+
+      .header h1 {
+        color: white;
+        font-size: 3em;
+        margin-bottom: 15px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        animation: glow 2s ease-in-out infinite alternate;
+      }
+
+      @keyframes glow {
+        from {
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3),
+            0 0 10px rgba(255, 255, 255, 0.2);
+        }
+        to {
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3),
+            0 0 20px rgba(255, 255, 255, 0.4);
+        }
+      }
+
+      .header p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.3em;
+        font-weight: 300;
+      }
+
+      .main-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 50px 20px;
+      }
+
+      .team-selection {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 25px;
+        max-width: 1200px;
+        width: 100%;
+        margin-bottom: 40px;
+      }
+
+      .team-btn {
+        background: linear-gradient(
+          145deg,
+          rgba(255, 255, 255, 0.95),
+          rgba(255, 255, 255, 0.85)
+        );
+        border: none;
+        padding: 30px 25px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 1.4em;
+        font-weight: bold;
+        color: #2c3e50;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .team-btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.4),
+          transparent
+        );
+        transition: left 0.5s;
+      }
+
+      .team-btn:hover::before {
+        left: 100%;
+      }
+
+      .team-btn:hover {
+        transform: translateY(-8px) scale(1.05);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        background: linear-gradient(145deg, #ffffff, rgba(255, 255, 255, 0.9));
+        border-color: rgba(255, 255, 255, 0.6);
+      }
+
+      .team-btn:active {
+        transform: translateY(-4px) scale(1.02);
+      }
+
+      .group-selection {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 50vh;
+        width: 100%;
+        max-width: 600px;
+        animation: fadeIn 0.6s ease-out;
+      }
+
+      .group-header {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 30px 40px;
+        border-radius: 20px;
+        margin-bottom: 40px;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        text-align: center;
+        width: 100%;
+      }
+
+      .group-header h2 {
+        font-size: 2.5em;
+        color: #2c3e50;
+        margin-bottom: 15px;
+      }
+
+      .group-header p {
+        color: #7f8c8d;
+        font-size: 1.2em;
+      }
+
+      .group-buttons {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 30px;
+      }
+
+      .group-btn {
+        background: linear-gradient(
+          145deg,
+          rgba(255, 255, 255, 0.95),
+          rgba(255, 255, 255, 0.85)
+        );
+        border: none;
+        padding: 40px 50px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 1.6em;
+        font-weight: bold;
+        color: #2c3e50;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .group-btn:hover {
+        transform: translateY(-8px) scale(1.05);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        background: linear-gradient(145deg, #ffffff, rgba(255, 255, 255, 0.9));
+      }
+
+      .game-screen {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 70vh;
+        width: 100%;
+        max-width: 900px;
+        animation: fadeIn 0.6s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .team-header {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 20px 40px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        text-align: center;
+      }
+
+      .team-header h2 {
+        font-size: 2.2em;
+        color: #2c3e50;
+        margin-bottom: 10px;
+      }
+
+      .team-header p {
+        color: #7f8c8d;
+        font-size: 1.1em;
+      }
+
+      .word-card {
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        padding: 60px 40px;
+        border-radius: 25px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        text-align: center;
+        min-height: 350px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 30px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .word-card::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: conic-gradient(
+          transparent,
+          rgba(102, 126, 234, 0.1),
+          transparent
+        );
+        animation: rotate 4s linear infinite;
+        z-index: 0;
+      }
+
+      @keyframes rotate {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .word-card > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .word-display {
+        font-size: 3.5em;
+        font-weight: 900;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 25px;
+        word-wrap: break-word;
+        line-height: 1.2;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        animation: pulse 2s ease-in-out infinite alternate;
+      }
+
+      @keyframes pulse {
+        from {
+          transform: scale(1);
+        }
+        to {
+          transform: scale(1.02);
+        }
+      }
+
+      .word-type {
+        font-size: 1.3em;
+        color: #ffffff;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        padding: 12px 24px;
+        border-radius: 25px;
+        margin-bottom: 20px;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .word-counter {
+        font-size: 1.2em;
+        color: #666;
+        background: rgba(0, 0, 0, 0.05);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 500;
+      }
+
+      .controls {
+        display: flex;
+        gap: 25px;
+        align-items: center;
+        margin-bottom: 25px;
+      }
+
+      .control-btn {
+        padding: 18px 35px;
+        border: none;
+        border-radius: 30px;
+        cursor: pointer;
+        font-size: 1.2em;
+        font-weight: bold;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        color: white;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .prev-btn {
+        background: linear-gradient(135deg, #6c757d, #495057);
+        box-shadow: 0 8px 25px rgba(108, 117, 125, 0.3);
+      }
+
+      .next-btn {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
+      }
+
+      .control-btn:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      .control-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .back-btn {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        padding: 15px 30px;
+        border: none;
+        border-radius: 25px;
+        color: white;
+        cursor: pointer;
+        font-size: 1.1em;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+      }
+
+      .back-btn:hover {
+        background: linear-gradient(135deg, #218838, #1e7e34);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(40, 167, 69, 0.4);
+      }
+
+      .stats {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 25px;
+        border-radius: 20px;
+        margin-top: 30px;
+        text-align: center;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .stats h3 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        font-size: 1.4em;
+      }
+
+      .stats p {
+        color: #666;
+        font-size: 1.1em;
+        line-height: 1.6;
+      }
+
+      @media (max-width: 768px) {
+        .header h1 {
+          font-size: 2.2em;
+        }
+
+        .word-display {
+          font-size: 2.5em;
+        }
+
+        .team-selection {
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+          gap: 20px;
+        }
+
+        .controls {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .word-card {
+          padding: 40px 20px;
+          min-height: 300px;
+        }
+
+        .group-buttons {
+          flex-direction: column;
+          gap: 20px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .word-display {
+          font-size: 2em;
+        }
+
+        .team-btn {
+          padding: 25px 20px;
+          font-size: 1.2em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>🎯 Whisper Challenge Game</h1>
+    </div>
+
+    <div class="main-container">
+      <div id="homeScreen">
+        <div class="team-selection">
+          <button class="team-btn" onclick="selectTeam(1)">Team 1</button>
+          <button class="team-btn" onclick="selectTeam(2)">Team 2</button>
+          <button class="team-btn" onclick="selectTeam(3)">Team 3</button>
+          <button class="team-btn" onclick="selectTeam(4)">Team 4</button>
+          <button class="team-btn" onclick="selectTeam(5)">Team 5</button>
+          <button class="team-btn" onclick="selectTeam(6)">Team 6</button>
+          <button class="team-btn" onclick="selectTeam(7)">Team 7</button>
+          <button class="team-btn" onclick="selectTeam(8)">Team 8</button>
+          <button class="team-btn" onclick="selectTeam(9)">Team 9</button>
+          <button class="team-btn" onclick="selectTeam(10)">Team 10</button>
+        </div>
+
+        <div class="stats">
+          <h3>🎮 Game Rules</h3>
+          <p>
+            <strong>Each team has 2 groups (A & B):</strong><br />
+            Each group gets 10 Words + 5 Sentences<br />
+            <strong>Total:</strong> 30 items per team (15 for Group A + 15 for
+            Group B)
+          </p>
+        </div>
+      </div>
+
+      <div id="groupSelection" class="group-selection">
+        <div class="group-header">
+          <h2 id="teamName">Team 1</h2>
+          <p>Select your group to start the challenge!</p>
+        </div>
+
+        <div class="group-buttons">
+          <button class="group-btn" onclick="startGame('A')">📝 Group A</button>
+          <button class="group-btn" onclick="startGame('B')">📋 Group B</button>
+        </div>
+
+        <button class="back-btn" onclick="goToTeamSelection()">
+          🏠 Back to Teams
+        </button>
+      </div>
+
+      <div id="gameScreen" class="game-screen">
+        <div class="team-header">
+          <h2 id="teamTitle">Team 1 - Group A</h2>
+          <p>Get ready for the whisper challenge!</p>
+        </div>
+
+        <div class="word-card">
+          <div class="word-type" id="wordType">Office Word</div>
+          <div class="word-display" id="wordDisplay">Loading...</div>
+          <div class="word-counter" id="wordCounter">1 / 15</div>
+        </div>
+
+        <div class="controls">
+          <button
+            class="control-btn prev-btn"
+            id="prevBtn"
+            onclick="previousWord()"
+          >
+            ← Previous
+          </button>
+          <button
+            class="control-btn next-btn"
+            id="nextBtn"
+            onclick="nextWord()"
+          >
+            Next →
+          </button>
+        </div>
+
+        <button class="back-btn" onclick="goToGroupSelection()">
+          🔙 Back to Groups
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // All available words organized for fixed distribution
+      const officeWords = [
+        "Deadline", "Zoom", "Mic-on", "Teamwork", "Coffee", "Jira", "VPN", "Standup", "Bean Bag", "Teams",
+        "Screen Shot", "Sick Leave", "Bug", "Merge Request", "Unmute", "Mute", "Condense", "OEM Tool", "PI Planning", "Sign In",
+        "Sign Out", "Zeliot", "Backup", "Manager", "Merge", "Repository", "Pull Request", "Commit", "Branch", "Token",
+        "Endpoint", "Deployment", "UAT", "Regression", "Refactor", "Integration", "DevOps", "CI/CD", "Container", "Microservice",
+        "Backend", "Frontend", "Sprint", "Standup", "Retrospective", "Backlog", "Roadmap", "IMEI", "Connectors", "VIN",
+        "Git", "Jenkins", "Docker", "Kubernetes", "Postman", "Hackathon", "Slack", "Linkedin", "Server", "MYSQL",
+        "Postgres", "URL", "API", "Network", "Database", "Framework", "Protocol", "Firewall", "Router", "Switch",
+        "Bandwidth", "Latency", "Proxy", "Gateway", "Cache", "Load Balancer", "SSL", "OAuth", "JWT", "REST",
+        "GraphQL", "WebSocket", "TCP", "UDP", "HTTP", "HTTPS", "DNS", "CDN", "VPS", "Cloud",
+        "AWS", "Azure", "GCP", "Lambda", "EC2", "S3", "RDS", "MongoDB", "Redis", "Elasticsearch"
+      ];
+
+      const randomWords = [
+        "Morning", "Sing", "Run", "Whistle", "Shake", "Hide", "Snap", "Draw", "Jump", "Act",
+        "Password", "Charger", "File", "Network", "Badge scanner", "Whiteboard", "Inbox", "Notification", "Clock", "Brainstorm",
+        "Alarm", "Stapler", "Eating", "Birthday", "Mouse", "Water bottle", "Clap", "Dance", "Bag", "Insta",
+        "Reels", "Philosophy", "Algorithm", "Cinnamon", "Mirage", "Subtle", "Paradox", "Rhythm", "Queue", "Vacuum",
+        "Euphoria", "Knuckle", "Dilemma", "Asthma", "Epitome", "Pneumonia", "Chaos", "Psychic", "Bubble", "Puppet",
+        "Mumble", "Paper", "Velvet", "Muffin", "Bamboo", "Vampire", "Peppy", "Football", "Inconvenient", "Hypothetical",
+        "Constitutional", "Bioluminescence", "Entrepreneurship", "Incomprehensible", "Inflammable", "Unbelievable", "Specific", "Statistics", "Strategy", "Miscommunication",
+        "Suspicion", "Verification", "Sincerely", "Consideration", "Repetition", "Satisfaction", "Knock", "Knife", "Honest", "Hour",
+        "Write", "Debt", "Island", "Plumber", "Receipt", "Quizzical", "Doodle", "Photosynthesis", "Artificial", "Biochemistry",
+        "Nanotechnology", "Hologram", "Cryptography", "Synchronize", "Hypothesis", "Purple dinosaur", "Fast and furious", "Copy cat", "Tickle monster", "Blah blah blah"
+      ];
+
+      const officeSentences = [
+        "You're on mute!", "Loop me in mail", "We will sync up later", "Restart Main service", "I forgot my RFID again.",
+        "I'm late again!", "Where is my notes?", "I'm printing the report.", "I spilled coffee on my desk.", "I'm on a break.",
+        "Let's go for lunch.", "My system is not working.", "I need a charger.", "Send it by EOD.", "I'll schedule a meeting.",
+        "I'm sharing my screen.", "Let me check the email.", "I need to submit the report.", "Please raise a ticket.", "That's not my task.",
+        "I'll follow up on that.", "Let's take this offline.", "It's in the pipeline.", "Deadline is tomorrow.", "I've completed my tasks.",
+        "I'm so sleepy.", "Please review this.", "I need a vacation.", "I hate Mondays.", "I love Fridays.",
+        "This week is hectic.", "I need 100% hike.", "Another boring meeting.", "Too many jira tasks.", "Deadline pressure!",
+        "I'm multitasking.", "The printer is jammed.", "Wi-Fi isn't working.", "The AC is too cold.", "Let's order snacks.",
+        "It's a no-meeting day.", "I got employee of the month!", "That's out of scope.", "Let's align on this.", "Take ownership.",
+        "Share the deck.", "Check with Your TL.", "Have a client meeting today.", "Clients are escalating on this.", "Sorry, I dropped off.",
+        "Let's use Google Meet.", "Share the meeting link.", "VPN is not working", "I just married my laptop.", "We forgot the password.",
+        "My Wi-Fi ran away.", "Let's schedule a nap break.", "The printer is on vacation.", "Raise PR by EOD.", "GitHub is my spirit animal.",
+        "Pratik wifi is not working.", "The server just asked for a raise.", "I uploaded my cat to the cloud.", "I accidentally coded my dreams.", "I debugged my toaster yesterday.",
+        "I'm allergic to PowerPoint.", "I forgot how to breathe.", "My tea is texting your coffee.", "Bubble mumble fumble humble.", "Paper pepper pupper proper.",
+        "Bake back pack pick.", "Puppet puppy popped pizza.", "Can we discuss now ?", "Ice cream shouldn't have bones.", "Big bugs bite bald bosses.",
+        "Kevin codes calmly under chaos.", "Larry left later laughing loudly.", "Ten tiny turtles took turns talking.", "Sam silently sings seven sad songs.", "She sells seashells today.",
+        "Do unicorns eat popcorn?", "I love purple pickles.", "Everything smells like Monday today.", "Muffins muttered mildly on Monday morning.", "Pink penguins paddle politely.",
+        "Quiet queens quickly quit quizzes.", "Tommy tickled ten tiny tigers.", "I renamed my code as disaster.js.", "The sun is typing in bold.", "The umbrella is inside out emotionally.",
+        "I'm arguing with a calendar.", "Block my calendar.", "I'm allergic to Tuesday.", "My task list ate itself.", "I dream in subtitles.",
+        "The pencil broke its leg.", "Prod is down", "Check this on UAT", "Finish this task by EOD.", "Deployment is on friday.",
+        "We need meeting room to discuss.", "This connector is not connecting.", "Server maintenance tonight.", "Database backup failed.", "Code review pending.",
+        "Sprint planning meeting.", "Daily standup at 10 AM.", "Release notes updated.", "Bug fix deployed.", "Feature toggle enabled."
+      ];
+
+      // Pre-defined fixed distribution for all teams
+      const teamDistribution = {
+        1: {
+          A: {
+            officeWords: officeWords.slice(0, 5),
+            randomWords: randomWords.slice(0, 5),
+            sentences: officeSentences.slice(0, 5)
+          },
+          B: {
+            officeWords: officeWords.slice(5, 10),
+            randomWords: randomWords.slice(5, 10),
+            sentences: officeSentences.slice(5, 10)
+          }
+        },
+        2: {
+          A: {
+            officeWords: officeWords.slice(10, 15),
+            randomWords: randomWords.slice(10, 15),
+            sentences: officeSentences.slice(10, 15)
+          },
+          B: {
+            officeWords: officeWords.slice(15, 20),
+            randomWords: randomWords.slice(15, 20),
+            sentences: officeSentences.slice(15, 20)
+          }
+        },
+        3: {
+          A: {
+            officeWords: officeWords.slice(20, 25),
+            randomWords: randomWords.slice(20, 25),
+            sentences: officeSentences.slice(20, 25)
+          },
+          B: {
+            officeWords: officeWords.slice(25, 30),
+            randomWords: randomWords.slice(25, 30),
+            sentences: officeSentences.slice(25, 30)
+          }
+        },
+        4: {
+          A: {
+            officeWords: officeWords.slice(30, 35),
+            randomWords: randomWords.slice(30, 35),
+            sentences: officeSentences.slice(30, 35)
+          },
+          B: {
+            officeWords: officeWords.slice(35, 40),
+            randomWords: randomWords.slice(35, 40),
+            sentences: officeSentences.slice(35, 40)
+          }
+        },
+        5: {
+          A: {
+            officeWords: officeWords.slice(40, 45),
+            randomWords: randomWords.slice(40, 45),
+            sentences: officeSentences.slice(40, 45)
+          },
+          B: {
+            officeWords: officeWords.slice(45, 50),
+            randomWords: randomWords.slice(45, 50),
+            sentences: officeSentences.slice(45, 50)
+          }
+        },
+        6: {
+          A: {
+            officeWords: officeWords.slice(50, 55),
+            randomWords: randomWords.slice(50, 55),
+            sentences: officeSentences.slice(50, 55)
+          },
+          B: {
+            officeWords: officeWords.slice(55, 60),
+            randomWords: randomWords.slice(55, 60),
+            sentences: officeSentences.slice(55, 60)
+          }
+        },
+        7: {
+          A: {
+            officeWords: officeWords.slice(60, 65),
+            randomWords: randomWords.slice(60, 65),
+            sentences: officeSentences.slice(60, 65)
+          },
+          B: {
+            officeWords: officeWords.slice(65, 70),
+            randomWords: randomWords.slice(65, 70),
+            sentences: officeSentences.slice(65, 70)
+          }
+        },
+        8: {
+          A: {
+            officeWords: officeWords.slice(70, 75),
+            randomWords: randomWords.slice(70, 75),
+            sentences: officeSentences.slice(70, 75)
+          },
+          B: {
+            officeWords: officeWords.slice(75, 80),
+            randomWords: randomWords.slice(75, 80),
+            sentences: officeSentences.slice(75, 80)
+          }
+        },
+        9: {
+          A: {
+            officeWords: officeWords.slice(80, 85),
+            randomWords: randomWords.slice(80, 85),
+            sentences: officeSentences.slice(80, 85)
+          },
+          B: {
+            officeWords: officeWords.slice(85, 90),
+            randomWords: randomWords.slice(85, 90),
+            sentences: officeSentences.slice(85, 90)
+          }
+        },
+        10: {
+          A: {
+            officeWords: officeWords.slice(90, 95),
+            randomWords: randomWords.slice(90, 95),
+            sentences: officeSentences.slice(90, 95)
+          },
+          B: {
+            officeWords: officeWords.slice(95, 100),
+            randomWords: randomWords.slice(95, 100),
+            sentences: officeSentences.slice(95, 100)
+          }
+        }
+      };
+
+      let currentTeam = 1;
+      let currentGroup = "A";
+      let currentWordIndex = 0;
+      let currentWords = [];
+
+      function selectTeam(teamNumber) {
+        currentTeam = teamNumber;
+        document.getElementById("teamName").textContent = `🎯 Team ${teamNumber}`;
+        document.getElementById("homeScreen").style.display = "none";
+        document.getElementById("groupSelection").style.display = "flex";
+      }
+
+      function startGame(group) {
+        currentGroup = group;
+        currentWordIndex = 0;
+
+        // Get fixed distribution for current team and group
+        const teamData = teamDistribution[currentTeam];
+        const groupData = teamData[group];
+
+        // Create the word list with fixed order
+        currentWords = [
+          ...groupData.officeWords.map((word) => ({ text: word, type: "Office Word" })),
+          ...groupData.randomWords.map((word) => ({ text: word, type: "Random Word" })),
+          ...groupData.sentences.map((sentence) => ({ text: sentence, type: "Office Sentence" }))
+        ];
+
+        document.getElementById("teamTitle").textContent = `🎯 Team ${currentTeam} - Group ${group}`;
+        document.getElementById("groupSelection").style.display = "none";
+        document.getElementById("gameScreen").style.display = "flex";
+
+        updateDisplay();
+      }
+
+      function updateDisplay() {
+        const current = currentWords[currentWordIndex];
+
+        document.getElementById("wordDisplay").textContent = current.text;
+        document.getElementById("wordType").textContent = current.type;
+        document.getElementById("wordCounter").textContent = `${currentWordIndex + 1} / 15`;
+
+        // Update button states
+        document.getElementById("prevBtn").disabled = currentWordIndex === 0;
+        document.getElementById("nextBtn").disabled = currentWordIndex === currentWords.length - 1;
+      }
+
+      function nextWord() {
+        if (currentWordIndex < currentWords.length - 1) {
+          currentWordIndex++;
+          updateDisplay();
+        }
+      }
+
+      function previousWord() {
+        if (currentWordIndex > 0) {
+          currentWordIndex--;
+          updateDisplay();
+        }
+      }
+
+      function goToTeamSelection() {
+        document.getElementById("groupSelection").style.display = "none";
+        document.getElementById("homeScreen").style.display = "block";
+      }
+
+      function goToGroupSelection() {
+        document.getElementById("gameScreen").style.display = "none";
+        document.getElementById("groupSelection").style.display = "flex";
+      }
+
+      // Keyboard navigation
+      document.addEventListener("keydown", function (e) {
+        if (document.getElementById("gameScreen").style.display === "flex") {
+          switch (e.key) {
+            case "ArrowRight":
+            case " ":
+              nextWord();
+              break;
+            case "ArrowLeft":
+              previousWord();
+              break;
+            case "Escape":
+              goToGroupSelection();
+              break;
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
